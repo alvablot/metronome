@@ -1,15 +1,25 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
+import kick1 from '../assets/samples/kick_close02.wav'
 
 function Beater() {
   const [tempo, setTempo] = useState<number>(1000)
   const [sixteenth, setSixteenth] = useState<number>(0)
   const [intervalId, setIntervalId] = useState<number>()
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  const playSound = (): void => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0
+      audioRef.current.play()
+    }
+  }
 
   const startTimer = (): void => {
     const newIntervalId = setInterval(() => {
       setSixteenth((steps) => steps + 1)
+      playSound()
     }, 60000 / tempo)
     setIntervalId(newIntervalId)
   }
@@ -17,11 +27,6 @@ function Beater() {
   const stopTimer = (): void => {
     clearInterval(intervalId)
     setIntervalId(undefined)
-  }
-
-  const handleSetTempo = (): void => {
-    stopTimer()
-    startTimer()
   }
 
   const handleTempoChange = (event: Event, newValue: number | number[]): void => {
@@ -50,6 +55,8 @@ function Beater() {
           onMouseUp={startTimer}
         />
       </Box>
+      <br />
+      <audio ref={audioRef} src={kick1} preload='auto' />
     </>
   )
 }
