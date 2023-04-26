@@ -2,14 +2,15 @@ import { useState, useRef } from 'react'
 import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
 import kick1 from '../assets/samples/kick_close02.wav'
+import snr1 from '../assets/samples/snr_ring01.wav'
 
 function Beater() {
-  const [tempo, setTempo] = useState<number>(1000)
+  const [tempo, setTempo] = useState<number>(120)
   const [sixteenth, setSixteenth] = useState<number>(0)
   const [intervalId, setIntervalId] = useState<number>()
   const audioRef = useRef<HTMLAudioElement>(null)
-
-  const playSound = (): void => {
+  const bpm = 60000 / tempo
+  const playSound = (drum: string): void => {
     if (audioRef.current) {
       audioRef.current.currentTime = 0
       audioRef.current.play()
@@ -19,8 +20,8 @@ function Beater() {
   const startTimer = (): void => {
     const newIntervalId = setInterval(() => {
       setSixteenth((steps) => steps + 1)
-      playSound()
-    }, 60000 / tempo)
+      playSound(kick1)
+    }, bpm)
     setIntervalId(newIntervalId)
   }
 
@@ -47,7 +48,7 @@ function Beater() {
         <Slider
           min={10}
           max={210}
-          defaultValue={50}
+          defaultValue={120}
           aria-label='Default'
           valueLabelDisplay='auto'
           onChange={handleTempoChange}
@@ -57,6 +58,7 @@ function Beater() {
       </Box>
       <br />
       <audio ref={audioRef} src={kick1} preload='auto' />
+ 
     </>
   )
 }
