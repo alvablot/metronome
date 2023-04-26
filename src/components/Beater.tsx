@@ -1,14 +1,16 @@
 import { useState } from 'react'
+import Box from '@mui/material/Box'
+import Slider from '@mui/material/Slider'
 
 function Beater() {
-  let tempo = 1000
+  const [tempo, setTempo] = useState<number>(1000)
   const [sixteenth, setSixteenth] = useState<number>(0)
   const [intervalId, setIntervalId] = useState<number>()
 
   const startTimer = (): void => {
     const newIntervalId = setInterval(() => {
       setSixteenth((steps) => steps + 1)
-    }, tempo)
+    }, 60000 / tempo)
     setIntervalId(newIntervalId)
   }
 
@@ -19,21 +21,35 @@ function Beater() {
 
   const handleSetTempo = (): void => {
     stopTimer()
-    tempo = 100
     startTimer()
+  }
+
+  const handleTempoChange = (event: Event, newValue: number | number[]): void => {
+    setTempo(newValue as number)
   }
 
   return (
     <>
-      <div>{tempo}</div>
+      <div>{Math.round(tempo)} bpm</div>
       {intervalId ? (
         <button onClick={stopTimer}>Stop</button>
       ) : (
         <button onClick={startTimer}>Start</button>
       )}
-      <button onClick={handleSetTempo}>Set tempo</button>
       <br />
       {sixteenth}
+      <Box width={300}>
+        <Slider
+          min={10}
+          max={210}
+          defaultValue={50}
+          aria-label='Default'
+          valueLabelDisplay='auto'
+          onChange={handleTempoChange}
+          onMouseDown={stopTimer}
+          onMouseUp={startTimer}
+        />
+      </Box>
     </>
   )
 }
