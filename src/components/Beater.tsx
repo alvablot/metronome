@@ -6,6 +6,7 @@ import Slider from '@mui/material/Slider'
 import { Howl } from 'howler'
 import kick1 from '../assets/samples/kick_close02.wav'
 import snr1 from '../assets/samples/snr_ring01.wav'
+import Checkbox from '@mui/material/Checkbox'
 
 function Beater() {
   const [tempo, setTempo] = useState<number>(120)
@@ -15,9 +16,22 @@ function Beater() {
   const startTempo = 120
   const [bpm, setBpm] = useState(7500 / startTempo)
 
-  const kickArray: boolean[] = [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false]
-  const snrArray: boolean[] = [false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false]
+  const [kickArray, setKickArray] = useState<boolean[]>([true, false, true, false, true, false, false, false ])
+  const [snrArray, setSnrArray] = useState<boolean[]>([true, false, true, false, true, false, false, false ])
+
   let timeIndicator = 0
+
+  const handleKickChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedKickArray = [...kickArray]
+    updatedKickArray[index] = event.target.checked
+    setKickArray(updatedKickArray)
+  }
+
+  const handleSnrChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedSnrArray = [...snrArray]
+    updatedSnrArray[index] = event.target.checked
+    setSnrArray(updatedSnrArray)
+  }
 
   const loadSounds = (): void => {
     kickSound.current = new Howl({ src: [kick1] })
@@ -41,7 +55,7 @@ function Beater() {
       console.log(snrArray[timeIndicator])
       if (snrArray[timeIndicator]) playSnr()
       if (kickArray[timeIndicator]) playKick()
-      timeIndicator = (timeIndicator + 1) % 32
+      timeIndicator = (timeIndicator + 1) % kickArray.length
     }, bpm)
     setIntervalId(newIntervalId)
   }
@@ -63,7 +77,7 @@ function Beater() {
       stopTimer()
       startTimer()
     }
-  }, [tempo])
+  }, [tempo, kickArray, snrArray])
 
   useEffect(() => {
     loadSounds()
@@ -79,6 +93,19 @@ function Beater() {
         <Slider min={10} max={210} defaultValue={startTempo} aria-label='Default' valueLabelDisplay='auto' onChange={handleTempoChange} />
       </Box>
       <br />
+      {kickArray.map((kick, index) => (
+        <span key={index}>
+          <Checkbox id={`kick-${index}`} checked={kick} onChange={handleKickChange(index)} />
+          {index % 4 === 3 ? ' | ' : ''}
+        </span>
+      ))}
+      <br />
+      {snrArray.map((snr, index) => (
+        <span key={index}>
+          <Checkbox id={`snr-${index}`} checked={snr} onChange={handleSnrChange(index)} />
+          {index % 4 === 3 ? ' | ' : ''}
+        </span>
+      ))}
     </>
   )
 }
