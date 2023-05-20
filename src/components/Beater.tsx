@@ -14,10 +14,11 @@ function Beater() {
   const kickSound = useRef<Howl | null>(null)
   const snrSound = useRef<Howl | null>(null)
   const startTempo = 120
-  const [bpm, setBpm] = useState(7500 / startTempo)
+  const [bpm, setBpm] = useState(15000 / startTempo)
+  const [time, setTime] = useState<number>(0)
 
-  const [kickArray, setKickArray] = useState<boolean[]>([true, false, true, false, true, false, false, false ])
-  const [snrArray, setSnrArray] = useState<boolean[]>([true, false, true, false, true, false, false, false ])
+  const [kickArray, setKickArray] = useState<boolean[]>([true, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false])
+  const [snrArray, setSnrArray] = useState<boolean[]>([false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false])
 
   let timeIndicator = 0
 
@@ -56,6 +57,7 @@ function Beater() {
       if (snrArray[timeIndicator]) playSnr()
       if (kickArray[timeIndicator]) playKick()
       timeIndicator = (timeIndicator + 1) % kickArray.length
+      if (timeIndicator > 0) setTime(timeIndicator)
     }, bpm)
     setIntervalId(newIntervalId)
   }
@@ -72,7 +74,7 @@ function Beater() {
   }
 
   useEffect(() => {
-    setBpm(7500 / tempo)
+    setBpm(15000 / tempo)
     if (intervalId) {
       stopTimer()
       startTimer()
@@ -87,25 +89,29 @@ function Beater() {
     <>
       <div>{Math.round(tempo)} bpm</div>
       {intervalId ? <button onClick={stopTimer}>Stop</button> : <button onClick={startTimer}>Start</button>}
-      <br />
-      {timeIndicator}
-      <Box width={300}>
-        <Slider min={10} max={210} defaultValue={startTempo} aria-label='Default' valueLabelDisplay='auto' onChange={handleTempoChange} />
-      </Box>
-      <br />
-      {kickArray.map((kick, index) => (
-        <span key={index}>
-          <Checkbox id={`kick-${index}`} checked={kick} onChange={handleKickChange(index)} />
-          {index % 4 === 3 ? ' | ' : ''}
-        </span>
-      ))}
-      <br />
-      {snrArray.map((snr, index) => (
-        <span key={index}>
-          <Checkbox id={`snr-${index}`} checked={snr} onChange={handleSnrChange(index)} />
-          {index % 4 === 3 ? ' | ' : ''}
-        </span>
-      ))}
+
+      <div className='tempo-slider'>
+        {Math.ceil(time / 4)}
+        <Box width={300}>
+          <Slider min={10} max={210} defaultValue={startTempo} aria-label='Default' valueLabelDisplay='auto' onChange={handleTempoChange} />
+        </Box>
+      </div>
+      <div>
+        {kickArray.map((kick, index) => (
+          <span key={index}>
+            <Checkbox id={`kick-${index}`} checked={kick} onChange={handleKickChange(index)} />
+            {index % 4 === 3 ? ' | ' : ''}
+          </span>
+        ))}
+
+        <br />
+        {snrArray.map((snr, index) => (
+          <span key={index}>
+            <Checkbox id={`snr-${index}`} checked={snr} onChange={handleSnrChange(index)} />
+            {index % 4 === 3 ? ' | ' : ''}
+          </span>
+        ))}
+      </div>
     </>
   )
 }
