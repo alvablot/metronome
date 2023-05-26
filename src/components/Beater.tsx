@@ -6,6 +6,7 @@ import Slider from '@mui/material/Slider'
 import { Howl } from 'howler'
 import kick1 from '../assets/samples/kick_close02.wav'
 import snr1 from '../assets/samples/snr_ring01.wav'
+import hh1 from '../assets/samples/hh cls-tip_95.wav'
 import Checkbox from '@mui/material/Checkbox'
 
 function Beater() {
@@ -13,31 +14,92 @@ function Beater() {
   const [intervalId, setIntervalId] = useState<number | undefined>()
   const kickSound = useRef<Howl | null>(null)
   const snrSound = useRef<Howl | null>(null)
+  const hhSound = useRef<Howl | null>(null)
   const startTempo = 120
-  const [bpm, setBpm] = useState(15000 / startTempo)
+  const [bpm, setBpm] = useState(7500 / startTempo)
   const [time, setTime] = useState<number>(0)
-  const barLength = 4
+  const thirtytwoTrippleNote = 1
+  const sixteetnhTrippleNote = 2
+  const eigthTrippleNote = 4
+  const quarterTrippleNote = 8
+  const sixteetnhNote = 3
+  const eighthNote = 6
+  const quarterNote = 12
+  const [snrNoteLength, setSnrNoteLength] = useState<number>(sixteetnhNote) //
 
-  const [kickArray, setKickArray] = useState<boolean[]>([true, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false])
-  const [snrArray, setSnrArray] = useState<boolean[]>([false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false])
+  const kickArrayLength = 192 / 2 // Desired length of the array
+  const generatedKickArray = Array(kickArrayLength).fill(false)
+  for (let i = 0; i < kickArrayLength; i += 6) {
+    generatedKickArray[i] = true
+  }
 
+  const [kickArray, setKickArray] = useState<boolean[]>(generatedKickArray)
+
+  const [snrArray, setSnrArray] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+  ])
+
+  const [hhArray, setHhArray] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+  ])
+  const barLength = kickArray.length / 4
   let timeIndicator = 0
 
-  const handleKickChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedKickArray = [...kickArray]
-    updatedKickArray[index] = event.target.checked
-    setKickArray(updatedKickArray)
-  }
+  const handleKickChange =
+    (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const updatedKickArray = [...kickArray]
+      updatedKickArray[index] = event.target.checked
+      setKickArray(updatedKickArray)
+    }
 
-  const handleSnrChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedSnrArray = [...snrArray]
-    updatedSnrArray[index] = event.target.checked
-    setSnrArray(updatedSnrArray)
-  }
+  const handleSnrChange =
+    (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const updatedSnrArray = [...snrArray]
+      updatedSnrArray[index] = event.target.checked
+      setSnrArray(updatedSnrArray)
+    }
+
+  const handleHhChange =
+    (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const updatedHhArray = [...hhArray]
+      updatedHhArray[index] = event.target.checked
+      setHhArray(updatedHhArray)
+    }
 
   const loadSounds = (): void => {
     kickSound.current = new Howl({ src: [kick1] })
     snrSound.current = new Howl({ src: [snr1] })
+    hhSound.current = new Howl({ src: [hh1] })
   }
 
   const playKick = (): void => {
@@ -52,11 +114,19 @@ function Beater() {
     }
   }
 
+  const playHh = (): void => {
+    if (hhSound.current) {
+      hhSound.current.play()
+    }
+  }
+
   const startTimer = (): void => {
     const newIntervalId = setInterval(() => {
       console.log(snrArray[timeIndicator])
-      if (snrArray[timeIndicator]) playSnr()
+
       if (kickArray[timeIndicator]) playKick()
+      // if (snrArray[timeIndicator]) playSnr()
+      // if (hhArray[timeIndicator]) playHh()
       timeIndicator = (timeIndicator + 1) % kickArray.length
       if (timeIndicator > 0) setTime(timeIndicator)
     }, bpm)
@@ -75,12 +145,12 @@ function Beater() {
   }
 
   useEffect(() => {
-    setBpm(15000 / tempo)
+    setBpm(7500 / tempo)
     if (intervalId) {
       stopTimer()
       startTimer()
     }
-  }, [tempo, kickArray, snrArray])
+  }, [tempo, kickArray, snrArray, hhArray])
 
   useEffect(() => {
     loadSounds()
@@ -88,31 +158,102 @@ function Beater() {
 
   return (
     <>
-      <div>{Math.round(tempo)} bpm</div>
-      {intervalId ? <button onClick={stopTimer}>Stop</button> : <button onClick={startTimer}>Start</button>}
+      {intervalId ? (
+        <button onClick={stopTimer}>Stop</button>
+      ) : (
+        <button onClick={startTimer}>Start</button>
+      )}
       <br />
-      {Math.ceil(time / barLength)}
-
+      Counter {Math.ceil(time / barLength)}
+      <div>{Math.round(tempo)} bpm</div>
       <div className='tempo-slider'>
         <Box width={300}>
-          <Slider min={10} max={210} defaultValue={startTempo} aria-label='Default' valueLabelDisplay='auto' onChange={handleTempoChange} />
+          <Slider
+            min={10}
+            max={210}
+            defaultValue={startTempo}
+            aria-label='Default'
+            valueLabelDisplay='auto'
+            onChange={handleTempoChange}
+          />
         </Box>
       </div>
       <div>
-        {kickArray.map((kick, index) => (
+        {/* {hhArray.map((hh, index) => (
           <span key={index}>
-            <Checkbox id={`kick-${index}`} checked={kick} onChange={handleKickChange(index)} />
+            <Checkbox id={`hh-${index}`} checked={hh} onChange={handleHhChange(index)} />
             {index % barLength === barLength - 1 ? ' | ' : ''}
           </span>
-        ))}
+        ))} */}
+        <br />
+        <button
+          className={snrNoteLength === eighthNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(eighthNote)
+          }}
+        >
+          8th
+        </button>
 
+        <button
+          className={snrNoteLength === sixteetnhNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(sixteetnhNote)
+          }}
+        >
+          16th
+        </button>
+        <button
+          className={snrNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(eigthTrippleNote)
+          }}
+        >
+          8th triplets
+        </button>
+        <button
+          className={snrNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(sixteetnhTrippleNote)
+          }}
+        >
+          16th triplets
+        </button>
+        {/* <button
+        className={snrNoteLength === eighthNote ? 'active-note' : ''}
+          onClick={() => {
+            setSnrNoteLength(thirtytwoTrippleNote)
+          }}
+        >
+          32th triplets
+        </button> */}
+
+        <br />
+        {kickArray.map((kick, index) => (
+          <span key={index}>
+            {(index % snrNoteLength === 0 || index === 0) && (
+              <input
+                type='checkbox'
+                id={`kick-${index}`}
+                checked={kick}
+                onChange={handleKickChange(index)}
+              />
+            )}
+            {index % 48 === 47 && <b> | </b>}
+          </span>
+        ))}
+        {/* 
         <br />
         {snrArray.map((snr, index) => (
           <span key={index}>
-            <Checkbox id={`snr-${index}`} checked={snr} onChange={handleSnrChange(index)} />
+            <Checkbox
+              id={`snr-${index}`}
+              checked={snr}
+              onChange={handleSnrChange(index)}
+            />
             {index % barLength === barLength - 1 ? ' | ' : ''}
           </span>
-        ))}
+        ))} */}
       </div>
     </>
   )

@@ -2,9 +2,16 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  text-align: left;
 }
-
+.active-note {
+  background-color: rgb(168, 0, 224);
+}
+.note,
+.active-note {
+  font-family: 'Amatic SC', cursive;
+  font-family: 'Fira Mono', monospace;
+}
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -19,7 +26,7 @@
 }
 .tempo-slider {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
   width: 100%;
 }
