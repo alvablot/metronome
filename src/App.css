@@ -7,11 +7,20 @@
 .active-note {
   background-color: rgb(168, 0, 224);
 }
+.active-indicator {
+  background-color: rgb(255, 0, 217);
+}
+
+.inactive-indicator {
+  background-color: transparent;
+}
+
 .note,
 .active-note {
   font-family: 'Amatic SC', cursive;
   font-family: 'Fira Mono', monospace;
 }
+
 .logo {
   height: 6em;
   padding: 1.5em;

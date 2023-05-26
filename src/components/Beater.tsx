@@ -29,6 +29,7 @@ function Beater() {
   const [kickNoteLength, setKickNoteLength] = useState<number>(sixteetnhNote) //
   const [snrNoteLength, setSnrNoteLength] = useState<number>(sixteetnhNote) //
   const [hhNoteLength, setHhNoteLength] = useState<number>(sixteetnhNote) //
+  const [colorIndicator, setColorIndicator] = useState<number>(0)
 
   const [numberOfBars, setNumbersOfBars] = useState<number>(2)
   const patternLength = numberOfBars * 48 // Desired length of the array
@@ -103,7 +104,7 @@ function Beater() {
 
   const startTimer = (): void => {
     const newIntervalId = setInterval(() => {
-      console.log(snrArray[timeIndicator])
+      setColorIndicator(timeIndicator)
 
       if (kickArray[timeIndicator]) playKick()
       if (snrArray[timeIndicator]) playSnr()
@@ -124,6 +125,10 @@ function Beater() {
   const handleTempoChange = (event: Event, newValue: number | number[]): void => {
     setTempo(newValue as number)
   }
+
+  useEffect(() => {
+    console.log(colorIndicator)
+  }, [colorIndicator])
 
   useEffect(() => {
     setBpm(3750 / tempo)
@@ -202,15 +207,21 @@ function Beater() {
           32th triplets
         </button> */}
         <br />
-        {hhArray.map((kick, index) => (
+        {hhArray.map((hh, index) => (
           <span key={index}>
             {(index % hhNoteLength === 0 || index === 0) && (
-              <input
-                type='checkbox'
-                id={`hh-${index}`}
-                checked={kick}
-                onChange={handleHhChange(index)}
-              />
+              <span
+                className={
+                  colorIndicator === index && hh ? 'active-indicator' : 'inactive-indicator'
+                }
+              >
+                <input
+                  type='checkbox'
+                  key={`hh-${index}`}
+                  checked={hh}
+                  onChange={handleHhChange(index)}
+                />
+              </span>
             )}
             {index % 48 === 47 && <b> | </b>}
           </span>
@@ -262,27 +273,81 @@ function Beater() {
         {kickArray.map((kick, index) => (
           <span key={index}>
             {(index % kickNoteLength === 0 || index === 0) && (
-              <input
-                type='checkbox'
-                id={`kick-${index}`}
-                checked={kick}
-                onChange={handleKickChange(index)}
-              />
+              <span
+                className={
+                  colorIndicator === index && kick  ? 'active-indicator' : 'inactive-indicator'
+                }
+              >
+                <input
+                  type='checkbox'
+                  key={`kick-${index}`}
+                  checked={kick}
+                  onChange={handleKickChange(index)}
+                />
+              </span>
             )}
             {index % 48 === 47 && <b> | </b>}
           </span>
         ))}
 
         <br />
-        {snrArray.map((kick, index) => (
+        <button
+          className={snrNoteLength === eighthNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(eighthNote)
+          }}
+        >
+          8th
+        </button>
+
+        <button
+          className={snrNoteLength === sixteetnhNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(sixteetnhNote)
+          }}
+        >
+          16th
+        </button>
+        <button
+          className={snrNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(eigthTrippleNote)
+          }}
+        >
+          8th triplets
+        </button>
+        <button
+          className={hhNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setHhNoteLength(sixteetnhTrippleNote)
+          }}
+        >
+          16th triplets
+        </button>
+        {/* <button
+        className={kickNoteLength === eighthNote ? 'active-note' : ''}
+          onClick={() => {
+            setKickNoteLength(thirtytwoTrippleNote)
+          }}
+        >
+          32th triplets
+        </button> */}
+        <br />
+        {snrArray.map((snr, index) => (
           <span key={index}>
             {(index % snrNoteLength === 0 || index === 0) && (
-              <input
-                type='checkbox'
-                id={`snr-${index}`}
-                checked={kick}
-                onChange={handleSnrChange(index)}
-              />
+              <span
+                className={
+                  colorIndicator === index && snr ? 'active-indicator' : 'inactive-indicator'
+                }
+              >
+                <input
+                  type='checkbox'
+                  key={`snr-${index}`}
+                  checked={snr}
+                  onChange={handleSnrChange(index)}
+                />
+              </span>
             )}
             {index % 48 === 47 && <b> | </b>}
           </span>
