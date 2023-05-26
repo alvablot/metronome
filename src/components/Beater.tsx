@@ -126,9 +126,9 @@ function Beater() {
     setTempo(newValue as number)
   }
 
-  useEffect(() => {
-    console.log(colorIndicator)
-  }, [colorIndicator])
+  // useEffect(() => {
+  //   console.log(colorIndicator)
+  // }, [colorIndicator])
 
   useEffect(() => {
     setBpm(3750 / tempo)
@@ -150,7 +150,7 @@ function Beater() {
         <button onClick={startTimer}>Start</button>
       )}
       <br />
-      Counter {Math.ceil(time / barLength)}
+      Counter {Math.ceil(time / 12)}
       <div>{Math.round(tempo)} bpm</div>
       <div className='tempo-slider'>
         <Box width={300}>
@@ -165,68 +165,7 @@ function Beater() {
         </Box>
       </div>
       <div>
-        <button
-          className={hhNoteLength === eighthNote ? 'active-note' : 'note'}
-          onClick={() => {
-            setHhNoteLength(eighthNote)
-          }}
-        >
-          8th
-        </button>
-
-        <button
-          className={hhNoteLength === sixteetnhNote ? 'active-note' : 'note'}
-          onClick={() => {
-            setHhNoteLength(sixteetnhNote)
-          }}
-        >
-          16th
-        </button>
-        <button
-          className={hhNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
-          onClick={() => {
-            setHhNoteLength(eigthTrippleNote)
-          }}
-        >
-          8th triplets
-        </button>
-        <button
-          className={hhNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
-          onClick={() => {
-            setHhNoteLength(sixteetnhTrippleNote)
-          }}
-        >
-          16th triplets
-        </button>
-        {/* <button
-        className={kickNoteLength === eighthNote ? 'active-note' : ''}
-          onClick={() => {
-            setKickNoteLength(thirtytwoTrippleNote)
-          }}
-        >
-          32th triplets
-        </button> */}
-        <br />
-        {hhArray.map((hh, index) => (
-          <span key={index}>
-            {(index % hhNoteLength === 0 || index === 0) && (
-              <span
-                className={
-                  colorIndicator === index && hh ? 'active-indicator' : 'inactive-indicator'
-                }
-              >
-                <input
-                  type='checkbox'
-                  key={`hh-${index}`}
-                  checked={hh}
-                  onChange={handleHhChange(index)}
-                />
-              </span>
-            )}
-            {index % 48 === 47 && <b> | </b>}
-          </span>
-        ))}
-
+        Kick drum
         <br />
         <button
           className={kickNoteLength === eighthNote ? 'active-note' : 'note'}
@@ -235,15 +174,6 @@ function Beater() {
           }}
         >
           8th
-        </button>
-
-        <button
-          className={kickNoteLength === sixteetnhNote ? 'active-note' : 'note'}
-          onClick={() => {
-            setKickNoteLength(sixteetnhNote)
-          }}
-        >
-          16th
         </button>
         <button
           className={kickNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
@@ -254,6 +184,14 @@ function Beater() {
           8th triplets
         </button>
         <button
+          className={kickNoteLength === sixteetnhNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setKickNoteLength(sixteetnhNote)
+          }}
+        >
+          16th
+        </button>
+        <button
           className={kickNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
           onClick={() => {
             setKickNoteLength(sixteetnhTrippleNote)
@@ -262,7 +200,7 @@ function Beater() {
           16th triplets
         </button>
         {/* <button
-        className={kickNoteLength === eighthNote ? 'active-note' : ''}
+          className={kickNoteLength === thirtytwoTrippleNote ? 'active-note' : 'note'}
           onClick={() => {
             setKickNoteLength(thirtytwoTrippleNote)
           }}
@@ -270,26 +208,34 @@ function Beater() {
           32th triplets
         </button> */}
         <br />
-        {kickArray.map((kick, index) => (
-          <span key={index}>
-            {(index % kickNoteLength === 0 || index === 0) && (
-              <span
-                className={
-                  colorIndicator === index && kick  ? 'active-indicator' : 'inactive-indicator'
-                }
-              >
-                <input
-                  type='checkbox'
-                  key={`kick-${index}`}
-                  checked={kick}
-                  onChange={handleKickChange(index)}
-                />
+        <div className='select-row'>
+          <div>
+            {kickArray.map((kick, index) => (
+              <span key={index}>
+                {(index % kickNoteLength === 0 || index === 0) && (
+                  <span
+                    className={
+                      colorIndicator === index && kick
+                        ? 'active-indicator'
+                        : 'inactive-indicator'
+                    }
+                  >
+                    <input
+                      type='checkbox'
+                      key={`kick-${index}`}
+                      checked={kick}
+                      onChange={handleKickChange(index)}
+                    />
+                  </span>
+                )}
+                {index % 48 === 47 && <div className='bar-stroke'> | </div>}
               </span>
-            )}
-            {index % 48 === 47 && <b> | </b>}
-          </span>
-        ))}
-
+            ))}
+          </div>
+        </div>
+        <br />
+        <br />
+        Snare drum
         <br />
         <button
           className={snrNoteLength === eighthNote ? 'active-note' : 'note'}
@@ -298,15 +244,6 @@ function Beater() {
           }}
         >
           8th
-        </button>
-
-        <button
-          className={snrNoteLength === sixteetnhNote ? 'active-note' : 'note'}
-          onClick={() => {
-            setSnrNoteLength(sixteetnhNote)
-          }}
-        >
-          16th
         </button>
         <button
           className={snrNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
@@ -317,6 +254,76 @@ function Beater() {
           8th triplets
         </button>
         <button
+          className={snrNoteLength === sixteetnhNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(sixteetnhNote)
+          }}
+        >
+          16th
+        </button>
+        <button
+          className={snrNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setSnrNoteLength(sixteetnhTrippleNote)
+          }}
+        >
+          16th triplets
+        </button>
+        <br />
+        <div className='select-row'>
+          <div>
+            {snrArray.map((snr, index) => (
+              <span key={index}>
+                {(index % snrNoteLength === 0 || index === 0) && (
+                  <span
+                    className={
+                      colorIndicator === index && snr
+                        ? 'active-indicator'
+                        : 'inactive-indicator'
+                    }
+                  >
+                    <input
+                      type='checkbox'
+                      key={`snr-${index}`}
+                      checked={snr}
+                      onChange={handleSnrChange(index)}
+                    />
+                  </span>
+                )}
+                {index % 48 === 47 && <div className='bar-stroke'> | </div>}
+              </span>
+            ))}
+          </div>
+        </div>
+        <br />
+        <br />
+        Hi-hat
+        <br />
+        <button
+          className={hhNoteLength === eighthNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setHhNoteLength(eighthNote)
+          }}
+        >
+          8th
+        </button>
+        <button
+          className={hhNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setHhNoteLength(eigthTrippleNote)
+          }}
+        >
+          8th triplets
+        </button>
+        <button
+          className={hhNoteLength === sixteetnhNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setHhNoteLength(sixteetnhNote)
+          }}
+        >
+          16th
+        </button>
+        <button
           className={hhNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
           onClick={() => {
             setHhNoteLength(sixteetnhTrippleNote)
@@ -324,34 +331,32 @@ function Beater() {
         >
           16th triplets
         </button>
-        {/* <button
-        className={kickNoteLength === eighthNote ? 'active-note' : ''}
-          onClick={() => {
-            setKickNoteLength(thirtytwoTrippleNote)
-          }}
-        >
-          32th triplets
-        </button> */}
         <br />
-        {snrArray.map((snr, index) => (
-          <span key={index}>
-            {(index % snrNoteLength === 0 || index === 0) && (
-              <span
-                className={
-                  colorIndicator === index && snr ? 'active-indicator' : 'inactive-indicator'
-                }
-              >
-                <input
-                  type='checkbox'
-                  key={`snr-${index}`}
-                  checked={snr}
-                  onChange={handleSnrChange(index)}
-                />
+        <div className='select-row'>
+          <div>
+            {hhArray.map((hh, index) => (
+              <span key={index}>
+                {(index % hhNoteLength === 0 || index === 0) && (
+                  <span
+                    className={
+                      colorIndicator === index && hh
+                        ? 'active-indicator'
+                        : 'inactive-indicator'
+                    }
+                  >
+                    <input
+                      type='checkbox'
+                      key={`hh-${index}`}
+                      checked={hh}
+                      onChange={handleHhChange(index)}
+                    />
+                  </span>
+                )}
+                {index % 48 === 47 && <div className='bar-stroke'> | </div>}
               </span>
-            )}
-            {index % 48 === 47 && <b> | </b>}
-          </span>
-        ))}
+            ))}
+          </div>
+        </div>
       </div>
     </>
   )
