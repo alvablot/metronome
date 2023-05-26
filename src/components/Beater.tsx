@@ -6,7 +6,8 @@ import Slider from '@mui/material/Slider'
 import { Howl } from 'howler'
 import kick1 from '../assets/samples/kick_close02.wav'
 import snr1 from '../assets/samples/snr_ring01.wav'
-import hh1 from '../assets/samples/hh cls-tip_95.wav'
+import hh1 from '../assets/samples/hh_cls-tip_95.wav'
+import rim from '../assets/samples/snare_rim_01.wav'
 import Checkbox from '@mui/material/Checkbox'
 
 function Beater() {
@@ -16,7 +17,7 @@ function Beater() {
   const snrSound = useRef<Howl | null>(null)
   const hhSound = useRef<Howl | null>(null)
   const startTempo = 120
-  const [bpm, setBpm] = useState(7500 / startTempo)
+  const [bpm, setBpm] = useState(3750 / startTempo)
   const [time, setTime] = useState<number>(0)
   const thirtytwoTrippleNote = 1
   const sixteetnhTrippleNote = 2
@@ -25,54 +26,34 @@ function Beater() {
   const sixteetnhNote = 3
   const eighthNote = 6
   const quarterNote = 12
+  const [kickNoteLength, setKickNoteLength] = useState<number>(sixteetnhNote) //
   const [snrNoteLength, setSnrNoteLength] = useState<number>(sixteetnhNote) //
+  const [hhNoteLength, setHhNoteLength] = useState<number>(sixteetnhNote) //
 
-  const kickArrayLength = 192 / 2 // Desired length of the array
-  const generatedKickArray = Array(kickArrayLength).fill(false)
-  for (let i = 0; i < kickArrayLength; i += 6) {
+  const [numberOfBars, setNumbersOfBars] = useState<number>(2)
+  const patternLength = numberOfBars * 48 // Desired length of the array
+
+  const [timeSignature, setTimeSignature] = useState<number>(3)
+
+  const generatedKickArray = Array(patternLength).fill(false)
+  for (let i = 0; i < patternLength; i += 48) {
     generatedKickArray[i] = true
   }
-
   const [kickArray, setKickArray] = useState<boolean[]>(generatedKickArray)
 
-  const [snrArray, setSnrArray] = useState<boolean[]>([
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    false,
-  ])
+  const generatedSnrArray = Array(patternLength).fill(false)
+  for (let i = 24; i < patternLength; i += 48) {
+    generatedSnrArray[i] = true
+  }
+  const [snrArray, setSnrArray] = useState<boolean[]>(generatedSnrArray)
 
-  const [hhArray, setHhArray] = useState<boolean[]>([
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    false,
-  ])
-  const barLength = kickArray.length / 4
+  const generatedHhArray = Array(patternLength).fill(false)
+  for (let i = 0; i < patternLength; i += 12) {
+    generatedHhArray[i] = true
+  }
+  const [hhArray, setHhArray] = useState<boolean[]>(generatedHhArray)
+
+  const barLength = kickArray.length / timeSignature
   let timeIndicator = 0
 
   const handleKickChange =
@@ -125,8 +106,8 @@ function Beater() {
       console.log(snrArray[timeIndicator])
 
       if (kickArray[timeIndicator]) playKick()
-      // if (snrArray[timeIndicator]) playSnr()
-      // if (hhArray[timeIndicator]) playHh()
+      if (snrArray[timeIndicator]) playSnr()
+      if (hhArray[timeIndicator]) playHh()
       timeIndicator = (timeIndicator + 1) % kickArray.length
       if (timeIndicator > 0) setTime(timeIndicator)
     }, bpm)
@@ -145,7 +126,7 @@ function Beater() {
   }
 
   useEffect(() => {
-    setBpm(7500 / tempo)
+    setBpm(3750 / tempo)
     if (intervalId) {
       stopTimer()
       startTimer()
@@ -179,59 +160,108 @@ function Beater() {
         </Box>
       </div>
       <div>
-        {/* {hhArray.map((hh, index) => (
-          <span key={index}>
-            <Checkbox id={`hh-${index}`} checked={hh} onChange={handleHhChange(index)} />
-            {index % barLength === barLength - 1 ? ' | ' : ''}
-          </span>
-        ))} */}
-        <br />
         <button
-          className={snrNoteLength === eighthNote ? 'active-note' : 'note'}
+          className={hhNoteLength === eighthNote ? 'active-note' : 'note'}
           onClick={() => {
-            setSnrNoteLength(eighthNote)
+            setHhNoteLength(eighthNote)
           }}
         >
           8th
         </button>
 
         <button
-          className={snrNoteLength === sixteetnhNote ? 'active-note' : 'note'}
+          className={hhNoteLength === sixteetnhNote ? 'active-note' : 'note'}
           onClick={() => {
-            setSnrNoteLength(sixteetnhNote)
+            setHhNoteLength(sixteetnhNote)
           }}
         >
           16th
         </button>
         <button
-          className={snrNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
+          className={hhNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
           onClick={() => {
-            setSnrNoteLength(eigthTrippleNote)
+            setHhNoteLength(eigthTrippleNote)
           }}
         >
           8th triplets
         </button>
         <button
-          className={snrNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
+          className={hhNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
           onClick={() => {
-            setSnrNoteLength(sixteetnhTrippleNote)
+            setHhNoteLength(sixteetnhTrippleNote)
           }}
         >
           16th triplets
         </button>
         {/* <button
-        className={snrNoteLength === eighthNote ? 'active-note' : ''}
+        className={kickNoteLength === eighthNote ? 'active-note' : ''}
           onClick={() => {
-            setSnrNoteLength(thirtytwoTrippleNote)
+            setKickNoteLength(thirtytwoTrippleNote)
           }}
         >
           32th triplets
         </button> */}
+        <br />
+        {hhArray.map((kick, index) => (
+          <span key={index}>
+            {(index % hhNoteLength === 0 || index === 0) && (
+              <input
+                type='checkbox'
+                id={`hh-${index}`}
+                checked={kick}
+                onChange={handleHhChange(index)}
+              />
+            )}
+            {index % 48 === 47 && <b> | </b>}
+          </span>
+        ))}
 
+        <br />
+        <button
+          className={kickNoteLength === eighthNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setKickNoteLength(eighthNote)
+          }}
+        >
+          8th
+        </button>
+
+        <button
+          className={kickNoteLength === sixteetnhNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setKickNoteLength(sixteetnhNote)
+          }}
+        >
+          16th
+        </button>
+        <button
+          className={kickNoteLength === eigthTrippleNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setKickNoteLength(eigthTrippleNote)
+          }}
+        >
+          8th triplets
+        </button>
+        <button
+          className={kickNoteLength === sixteetnhTrippleNote ? 'active-note' : 'note'}
+          onClick={() => {
+            setKickNoteLength(sixteetnhTrippleNote)
+          }}
+        >
+          16th triplets
+        </button>
+        {/* <button
+        className={kickNoteLength === eighthNote ? 'active-note' : ''}
+          onClick={() => {
+            setKickNoteLength(thirtytwoTrippleNote)
+          }}
+        >
+          32th triplets
+        </button> */}
         <br />
         {kickArray.map((kick, index) => (
           <span key={index}>
-            {(index % snrNoteLength === 0 || index === 0) && (
+            {(index % kickNoteLength === 0 || index === 0) && (
               <input
                 type='checkbox'
                 id={`kick-${index}`}
@@ -242,18 +272,21 @@ function Beater() {
             {index % 48 === 47 && <b> | </b>}
           </span>
         ))}
-        {/* 
+
         <br />
-        {snrArray.map((snr, index) => (
+        {snrArray.map((kick, index) => (
           <span key={index}>
-            <Checkbox
-              id={`snr-${index}`}
-              checked={snr}
-              onChange={handleSnrChange(index)}
-            />
-            {index % barLength === barLength - 1 ? ' | ' : ''}
+            {(index % snrNoteLength === 0 || index === 0) && (
+              <input
+                type='checkbox'
+                id={`snr-${index}`}
+                checked={kick}
+                onChange={handleSnrChange(index)}
+              />
+            )}
+            {index % 48 === 47 && <b> | </b>}
           </span>
-        ))} */}
+        ))}
       </div>
     </>
   )
