@@ -22,7 +22,7 @@ function Beater() {
 
   const kickSound = useRef<Howl[] | null[]>([null, null, null])
   const snrSound = useRef<Howl[] | null[]>([null, null, null])
-  const hhSound = useRef<Howl | null>(null)
+  const hhSound = useRef<Howl[] | null[]>([null, null, null])
 
   const startTempo = 120
   const [bpm, setBpm] = useState(3750 / startTempo)
@@ -50,29 +50,35 @@ function Beater() {
   for (let i = 0; i < patternLength; i += 48) {
     generatedKickArray[i] = 1
   }
+
   const [kickArray, setKickArray] = useState<number[]>(generatedKickArray)
+  const kickArrayRef = useRef<number[]>(kickArray)
 
   const generatedSnrArray = Array(patternLength).fill(0)
   for (let i = 24; i < patternLength; i += 48) {
     generatedSnrArray[i] = 1
   }
   const [snrArray, setSnrArray] = useState<number[]>(generatedSnrArray)
+  const snrArrayRef = useRef<number[]>(snrArray)
 
   const generatedHhArray = Array(patternLength).fill(0)
   for (let i = 0; i < patternLength; i += 12) {
     generatedHhArray[i] = 1
   }
   const [hhArray, setHhArray] = useState<number[]>(generatedHhArray)
+  const hhArrayRef = useRef<number[]>(hhArray)
 
   const barLength = kickArray.length / timeSignature
   let timeIndicator = 0
 
-  const handleKickChange =
-    (index: number, level) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const updatedKickArray = [...kickArray]
-      updatedKickArray[index] = level
-      setKickArray(updatedKickArray)
-    }
+  const handleKickChange = (index: number) => (): void => {
+    const updatedKickArray = [...kickArray]
+    const currentValue = updatedKickArray[index]
+    const newValue = (currentValue + 1) % 4
+
+    updatedKickArray[index] = newValue
+    setKickArray(updatedKickArray)
+  }
 
   const handleSnrChange = (index: number) => (): void => {
     const updatedSnrArray = [...snrArray]
@@ -83,54 +89,49 @@ function Beater() {
     setSnrArray(updatedSnrArray)
   }
 
-  const handleHhChange =
-    (index: number, level) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const updatedHhArray = [...hhArray]
-      updatedHhArray[index] = level
-      setHhArray(updatedHhArray)
-    }
+  const handleHhChange = (index: number) => (): void => {
+    const updatedHhArray = [...hhArray]
+    const currentValue = updatedHhArray[index]
+    const newValue = (currentValue + 1) % 4
+
+    updatedHhArray[index] = newValue
+    setHhArray(updatedHhArray)
+  }
 
   const loadSounds = (): void => {
     kickSound.current[0] = new Howl({ src: [kick1] })
     kickSound.current[1] = new Howl({ src: [kick2] })
     kickSound.current[2] = new Howl({ src: [kick3] })
-    snrSound.current[1] = new Howl({ src: [snr2] }) 
-    snrSound.current[2] = new Howl({ src: [snr1] })
-    snrSound.current[3] = new Howl({ src: [snr3] })
-    hhSound.current = new Howl({ src: [hh1] })
+    snrSound.current[0] = new Howl({ src: [snr2] })
+    snrSound.current[1] = new Howl({ src: [snr1] })
+    snrSound.current[2] = new Howl({ src: [snr3] })
+    hhSound.current[0] = new Howl({ src: [hh1] })
+    hhSound.current[1] = new Howl({ src: [hh2] })
+    hhSound.current[2] = new Howl({ src: [hh3] })
   }
 
-  const playKick = (): void => {
+  const playKick = (index: number): void => {
     if (kickSound.current[0]) {
-      kickSound.current[1].play()
+      if (kickArrayRef.current[index] === 1) kickSound.current[0].play()
+      if (kickArrayRef.current[index] === 2) kickSound.current[1].play()
+      if (kickArrayRef.current[index] === 3) kickSound.current[2].play()
     }
   }
 
-  const playSnr = (level: number): void => {
-    if (snrSound.current[level]) {
-      snrSound.current[level].play()
+  const playSnr = (index: number): void => {
+    if (snrSound.current[0]) {
+      if (snrArrayRef.current[index] === 1) snrSound.current[0].play()
+      if (snrArrayRef.current[index] === 2) snrSound.current[1].play()
+      if (snrArrayRef.current[index] === 3) snrSound.current[2].play()
     }
   }
 
-  const playHh = (): void => {
-    if (hhSound.current) {
-      hhSound.current.play()
+  const playHh = (index: number): void => {
+    if (kickSound.current[0]) {
+      if (hhArrayRef.current[index] === 1) hhSound.current[0].play()
+      if (hhArrayRef.current[index] === 2) hhSound.current[1].play()
+      if (hhArrayRef.current[index] === 3) hhSound.current[2].play()
     }
-  }
-
-  const startTimer = (): void => {
-    const newIntervalId = setInterval(() => {
-      setColorIndicator(timeIndicator)
-
-      if (kickArray[timeIndicator] === 1) playKick()
-      if (snrArray[timeIndicator] === 1) playSnr(1)
-      if (snrArray[timeIndicator] === 2) playSnr(2)
-      if (snrArray[timeIndicator] === 3) playSnr(3)
-      if (hhArray[timeIndicator] === 1) playHh()
-      timeIndicator = (timeIndicator + 1) % kickArray.length
-      if (timeIndicator > 0) setTime(timeIndicator)
-    }, bpm)
-    setIntervalId(newIntervalId)
   }
 
   const stopTimer = (): void => {
@@ -144,9 +145,19 @@ function Beater() {
     setTempo(newValue as number)
   }
 
-  useEffect(() => {
-    console.log(snrArray)
-  }, [snrArray])
+  const startTimer = (): void => {
+    const newIntervalId = setInterval(() => {
+      setColorIndicator(timeIndicator)
+      timeIndicator = (timeIndicator + 1) % kickArray.length
+      if (timeIndicator === 0) setTime(0)
+
+      playKick(timeIndicator)
+      playSnr(timeIndicator)
+      playHh(timeIndicator)
+    }, bpm)
+
+    setIntervalId(newIntervalId)
+  }
 
   useEffect(() => {
     setBpm(3750 / tempo)
@@ -154,7 +165,19 @@ function Beater() {
       stopTimer()
       startTimer()
     }
-  }, [tempo, kickArray, snrArray, hhArray])
+  }, [tempo])
+
+  useEffect(() => {
+    kickArrayRef.current = kickArray
+  }, [kickArray])
+
+  useEffect(() => {
+    snrArrayRef.current = snrArray
+  }, [snrArray])
+
+  useEffect(() => {
+    hhArrayRef.current = hhArray
+  }, [hhArray])
 
   useEffect(() => {
     loadSounds()
@@ -217,14 +240,6 @@ function Beater() {
         >
           16th triplets
         </button>
-        {/* <button
-          className={kickNoteLength === thirtytwoTrippleNote ? 'active-note' : 'note'}
-          onClick={() => {
-            setKickNoteLength(thirtytwoTrippleNote)
-          }}
-        >
-          32th triplets
-        </button> */}
         <br />
         <div className='select-row'>
           <div>
@@ -239,12 +254,13 @@ function Beater() {
                         : 'inactive-indicator'
                     }
                   >
-                    <input
-                      type='checkbox'
+                    <button
                       key={`kick-${index}`}
-                      checked={kick === 1}
-                      onChange={handleKickChange(index, kick === 1 ? 0 : 1)}
-                    />
+                      className={kick === index ? 'active-button' : 'inactive-button'}
+                      onClick={handleKickChange(index)}
+                    >
+                      {kick}
+                    </button>
                   </span>
                 )}
                 {index % 48 === 47 && <div className='bar-stroke'> | </div>}
@@ -288,9 +304,6 @@ function Beater() {
         >
           16th triplets
         </button>
-        {/* //////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////// */}
         <br />
         <div className='select-row'>
           <div>
@@ -319,9 +332,6 @@ function Beater() {
             ))}
           </div>
         </div>
-        {/* //////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////// */}
         <br />
         <br />
         Hi-hat
@@ -372,12 +382,13 @@ function Beater() {
                         : 'inactive-indicator'
                     }
                   >
-                    <input
-                      type='checkbox'
+                    <button
                       key={`hh-${index}`}
-                      checked={hh === 1}
-                      onChange={handleHhChange(index, hh === 1 ? 0 : 1)}
-                    />
+                      className={hh === index ? 'active-button' : 'inactive-button'}
+                      onClick={handleHhChange(index)}
+                    >
+                      {hh}
+                    </button>
                   </span>
                 )}
                 {index % 48 === 47 && <div className='bar-stroke'> | </div>}
