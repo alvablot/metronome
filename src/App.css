@@ -8,6 +8,7 @@
   display: flex;
   width: 100%;
   min-width: 1100px;
+  text-align: center;
 }
 .select-row > div {
   flex: 1;
@@ -16,9 +17,9 @@
 }
 .bar-stroke {
   margin: 0 0.5em;
-  font-size: 2rem;
+  font-size: 1.5rem;
   position: relative;
-  top: -1rem;
+  top: -0.5rem;
 }
 
 .active-note {

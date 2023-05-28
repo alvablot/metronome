@@ -4,18 +4,26 @@ import { useState, useRef, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
 import { Howl } from 'howler'
-import kick1 from '../assets/samples/kick_close02.wav'
-import snr1 from '../assets/samples/snr_ring01.wav'
-import hh1 from '../assets/samples/hh_cls-tip_95.wav'
+import kick1 from '../assets/samples/kick_1.wav'
+import kick2 from '../assets/samples/kick_2.wav'
+import kick3 from '../assets/samples/kick_3.wav'
+import snr1 from '../assets/samples/snr_1.wav'
+import snr2 from '../assets/samples/snr_2.wav'
+import snr3 from '../assets/samples/snr_3.wav'
+import hh1 from '../assets/samples/hh_1.wav'
+import hh2 from '../assets/samples/hh_2.wav'
+import hh3 from '../assets/samples/hh_3.wav'
 import rim from '../assets/samples/snare_rim_01.wav'
 import Checkbox from '@mui/material/Checkbox'
 
 function Beater() {
   const [tempo, setTempo] = useState<number>(120)
   const [intervalId, setIntervalId] = useState<number | undefined>()
-  const kickSound = useRef<Howl | null>(null)
-  const snrSound = useRef<Howl | null>(null)
+
+  const kickSound = useRef<Howl[] | null[]>([null, null, null])
+  const snrSound = useRef<Howl[] | null[]>([null, null, null])
   const hhSound = useRef<Howl | null>(null)
+
   const startTempo = 120
   const [bpm, setBpm] = useState(3750 / startTempo)
   const [time, setTime] = useState<number>(0)
@@ -31,68 +39,76 @@ function Beater() {
   const [hhNoteLength, setHhNoteLength] = useState<number>(sixteetnhNote) //
   const [colorIndicator, setColorIndicator] = useState<number>(0)
 
-  const [numberOfBars, setNumbersOfBars] = useState<number>(2)
+  const [updatedSnr, setUpdatedSnr] = useState<number>(0)
+
+  const [numberOfBars, setNumbersOfBars] = useState<number>(1)
   const patternLength = numberOfBars * 48 // Desired length of the array
 
   const [timeSignature, setTimeSignature] = useState<number>(3)
 
-  const generatedKickArray = Array(patternLength).fill(false)
+  const generatedKickArray = Array(patternLength).fill(0)
   for (let i = 0; i < patternLength; i += 48) {
-    generatedKickArray[i] = true
+    generatedKickArray[i] = 1
   }
-  const [kickArray, setKickArray] = useState<boolean[]>(generatedKickArray)
+  const [kickArray, setKickArray] = useState<number[]>(generatedKickArray)
 
-  const generatedSnrArray = Array(patternLength).fill(false)
+  const generatedSnrArray = Array(patternLength).fill(0)
   for (let i = 24; i < patternLength; i += 48) {
-    generatedSnrArray[i] = true
+    generatedSnrArray[i] = 1
   }
-  const [snrArray, setSnrArray] = useState<boolean[]>(generatedSnrArray)
+  const [snrArray, setSnrArray] = useState<number[]>(generatedSnrArray)
 
-  const generatedHhArray = Array(patternLength).fill(false)
+  const generatedHhArray = Array(patternLength).fill(0)
   for (let i = 0; i < patternLength; i += 12) {
-    generatedHhArray[i] = true
+    generatedHhArray[i] = 1
   }
-  const [hhArray, setHhArray] = useState<boolean[]>(generatedHhArray)
+  const [hhArray, setHhArray] = useState<number[]>(generatedHhArray)
 
   const barLength = kickArray.length / timeSignature
   let timeIndicator = 0
 
   const handleKickChange =
-    (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (index: number, level) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const updatedKickArray = [...kickArray]
-      updatedKickArray[index] = event.target.checked
+      updatedKickArray[index] = level
       setKickArray(updatedKickArray)
     }
 
-  const handleSnrChange =
-    (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const updatedSnrArray = [...snrArray]
-      updatedSnrArray[index] = event.target.checked
-      setSnrArray(updatedSnrArray)
-    }
+  const handleSnrChange = (index: number) => (): void => {
+    const updatedSnrArray = [...snrArray]
+    const currentValue = updatedSnrArray[index]
+    const newValue = (currentValue + 1) % 4
+
+    updatedSnrArray[index] = newValue
+    setSnrArray(updatedSnrArray)
+  }
 
   const handleHhChange =
-    (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (index: number, level) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const updatedHhArray = [...hhArray]
-      updatedHhArray[index] = event.target.checked
+      updatedHhArray[index] = level
       setHhArray(updatedHhArray)
     }
 
   const loadSounds = (): void => {
-    kickSound.current = new Howl({ src: [kick1] })
-    snrSound.current = new Howl({ src: [snr1] })
+    kickSound.current[0] = new Howl({ src: [kick1] })
+    kickSound.current[1] = new Howl({ src: [kick2] })
+    kickSound.current[2] = new Howl({ src: [kick3] })
+    snrSound.current[1] = new Howl({ src: [snr2] }) 
+    snrSound.current[2] = new Howl({ src: [snr1] })
+    snrSound.current[3] = new Howl({ src: [snr3] })
     hhSound.current = new Howl({ src: [hh1] })
   }
 
   const playKick = (): void => {
-    if (kickSound.current) {
-      kickSound.current.play()
+    if (kickSound.current[0]) {
+      kickSound.current[1].play()
     }
   }
 
-  const playSnr = (): void => {
-    if (snrSound.current) {
-      snrSound.current.play()
+  const playSnr = (level: number): void => {
+    if (snrSound.current[level]) {
+      snrSound.current[level].play()
     }
   }
 
@@ -106,9 +122,11 @@ function Beater() {
     const newIntervalId = setInterval(() => {
       setColorIndicator(timeIndicator)
 
-      if (kickArray[timeIndicator]) playKick()
-      if (snrArray[timeIndicator]) playSnr()
-      if (hhArray[timeIndicator]) playHh()
+      if (kickArray[timeIndicator] === 1) playKick()
+      if (snrArray[timeIndicator] === 1) playSnr(1)
+      if (snrArray[timeIndicator] === 2) playSnr(2)
+      if (snrArray[timeIndicator] === 3) playSnr(3)
+      if (hhArray[timeIndicator] === 1) playHh()
       timeIndicator = (timeIndicator + 1) % kickArray.length
       if (timeIndicator > 0) setTime(timeIndicator)
     }, bpm)
@@ -126,9 +144,9 @@ function Beater() {
     setTempo(newValue as number)
   }
 
-  // useEffect(() => {
-  //   console.log(colorIndicator)
-  // }, [colorIndicator])
+  useEffect(() => {
+    console.log(snrArray)
+  }, [snrArray])
 
   useEffect(() => {
     setBpm(3750 / tempo)
@@ -210,6 +228,7 @@ function Beater() {
         <br />
         <div className='select-row'>
           <div>
+            <div className='bar-stroke'> | </div>
             {kickArray.map((kick, index) => (
               <span key={index}>
                 {(index % kickNoteLength === 0 || index === 0) && (
@@ -223,8 +242,8 @@ function Beater() {
                     <input
                       type='checkbox'
                       key={`kick-${index}`}
-                      checked={kick}
-                      onChange={handleKickChange(index)}
+                      checked={kick === 1}
+                      onChange={handleKickChange(index, kick === 1 ? 0 : 1)}
                     />
                   </span>
                 )}
@@ -269,9 +288,13 @@ function Beater() {
         >
           16th triplets
         </button>
+        {/* //////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////// */}
         <br />
         <div className='select-row'>
           <div>
+            <div className='bar-stroke'> | </div>
             {snrArray.map((snr, index) => (
               <span key={index}>
                 {(index % snrNoteLength === 0 || index === 0) && (
@@ -282,12 +305,13 @@ function Beater() {
                         : 'inactive-indicator'
                     }
                   >
-                    <input
-                      type='checkbox'
+                    <button
                       key={`snr-${index}`}
-                      checked={snr}
-                      onChange={handleSnrChange(index)}
-                    />
+                      className={snr === index ? 'active-button' : 'inactive-button'}
+                      onClick={handleSnrChange(index)}
+                    >
+                      {snr}
+                    </button>
                   </span>
                 )}
                 {index % 48 === 47 && <div className='bar-stroke'> | </div>}
@@ -295,6 +319,9 @@ function Beater() {
             ))}
           </div>
         </div>
+        {/* //////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////// */}
         <br />
         <br />
         Hi-hat
@@ -334,6 +361,7 @@ function Beater() {
         <br />
         <div className='select-row'>
           <div>
+            <div className='bar-stroke'> | </div>
             {hhArray.map((hh, index) => (
               <span key={index}>
                 {(index % hhNoteLength === 0 || index === 0) && (
@@ -347,8 +375,8 @@ function Beater() {
                     <input
                       type='checkbox'
                       key={`hh-${index}`}
-                      checked={hh}
-                      onChange={handleHhChange(index)}
+                      checked={hh === 1}
+                      onChange={handleHhChange(index, hh === 1 ? 0 : 1)}
                     />
                   </span>
                 )}
