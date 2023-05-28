@@ -22,14 +22,29 @@
   top: -0.5rem;
 }
 
+.button-1 {
+  background-color: rgb(224, 209, 0);
+  color: black;
+}
+.button-2 {
+  background-color: rgb(34, 224, 0);
+  color: black;
+}
+.button-3 {
+  background-color: rgb(249, 54, 54);
+  color: black;
+}
+
 .active-note {
   background-color: rgb(168, 0, 224);
 }
 .active-indicator {
+  padding: 2px;
   background-color: rgb(255, 0, 217);
 }
 
 .inactive-indicator {
+  padding: 2px;
   background-color: transparent;
 }
 

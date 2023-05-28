@@ -249,14 +249,12 @@ function Beater() {
                 {(index % kickNoteLength === 0 || index === 0) && (
                   <span
                     className={
-                      colorIndicator === index && kick
-                        ? 'active-indicator'
-                        : 'inactive-indicator'
+                      colorIndicator === index ? 'active-indicator' : 'inactive-indicator'
                     }
                   >
                     <button
                       key={`kick-${index}`}
-                      className={kick === index ? 'active-button' : 'inactive-button'}
+                      className={`button-${kick}`}
                       onClick={handleKickChange(index)}
                     >
                       {kick}
@@ -313,14 +311,12 @@ function Beater() {
                 {(index % snrNoteLength === 0 || index === 0) && (
                   <span
                     className={
-                      colorIndicator === index && snr
-                        ? 'active-indicator'
-                        : 'inactive-indicator'
+                      colorIndicator === index ? 'active-indicator' : 'inactive-indicator'
                     }
                   >
                     <button
                       key={`snr-${index}`}
-                      className={snr === index ? 'active-button' : 'inactive-button'}
+                      className={`button-${snr}`}
                       onClick={handleSnrChange(index)}
                     >
                       {snr}
@@ -377,14 +373,12 @@ function Beater() {
                 {(index % hhNoteLength === 0 || index === 0) && (
                   <span
                     className={
-                      colorIndicator === index && hh
-                        ? 'active-indicator'
-                        : 'inactive-indicator'
+                      colorIndicator === index ? 'active-indicator' : 'inactive-indicator'
                     }
                   >
                     <button
                       key={`hh-${index}`}
-                      className={hh === index ? 'active-button' : 'inactive-button'}
+                      className={`button-${hh}`}
                       onClick={handleHhChange(index)}
                     >
                       {hh}
