@@ -1,8 +1,57 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem;
+  text-align: left;
+}
+.select-row {
+  display: flex;
+  width: 100%;
+  min-width: 1100px;
   text-align: center;
+}
+.select-row > div {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+}
+.bar-stroke {
+  margin: 0 0.5em;
+  font-size: 1.5rem;
+  position: relative;
+  top: -0.5rem;
+}
+
+.button-1 {
+  background-color: rgb(224, 209, 0);
+  color: black;
+}
+.button-2 {
+  background-color: rgb(34, 224, 0);
+  color: black;
+}
+.button-3 {
+  background-color: rgb(249, 54, 54);
+  color: black;
+}
+
+.active-note {
+  background-color: rgb(168, 0, 224);
+}
+.active-indicator {
+  padding: 2px;
+  background-color: rgb(255, 0, 217);
+}
+
+.inactive-indicator {
+  padding: 2px;
+  background-color: transparent;
+}
+
+.note,
+.active-note {
+  font-family: 'Amatic SC', cursive;
+  font-family: 'Fira Mono', monospace;
 }
 
 .logo {
@@ -17,7 +66,12 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
-
+.tempo-slider {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  width: 100%;
+}
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
